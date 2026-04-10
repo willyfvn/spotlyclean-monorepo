@@ -1,0 +1,19 @@
+{
+  "name": "@spotlyclean/convex",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./convex/_generated/api.js",
+  "types": "./convex/_generated/api.d.ts",
+  "scripts": {
+    "dev": "convex dev",
+    "deploy": "convex deploy",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "convex": "^1.13.0",
+    "@convex-dev/auth": "^0.0.62"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}
