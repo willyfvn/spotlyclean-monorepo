@@ -42,39 +42,12 @@ export function Pricing() {
             <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-charcoal sm:text-4xl">
               If it&rsquo;s not perfect, you don&rsquo;t pay for the redo.
             </h2>
-            <p className="mt-4 text-charcoal/50">
-              Every SpotlyClean visit comes with hard guarantees &mdash; backed
-              by our company, not fine print.
-            </p>
           </div>
         </ScrollReveal>
 
         {/* Certificate panel */}
         <ScrollReveal animation="scale-in" delay={200}>
-          <div className="mt-14 overflow-hidden rounded-3xl border-2 border-forest/15 bg-white">
-            {/* Certificate header */}
-            <div className="flex items-center justify-center gap-3 bg-forest-deep py-5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold">
-                <svg
-                  className="h-5 w-5 text-forest-deep"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
-                  />
-                </svg>
-              </div>
-              <p className="font-display text-lg italic text-white">
-                SpotlyClean Guarantee
-              </p>
-            </div>
-
-            {/* Guarantee rows */}
+          <div className="mt-14 overflow-hidden rounded-3xl border border-charcoal/[0.06] bg-white">
             {guarantees.map((g, i) => (
               <div
                 key={g.title}

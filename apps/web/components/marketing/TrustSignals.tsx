@@ -79,16 +79,10 @@ const badges = [
   },
 ]
 
-const TRUSTED_BY = [
-  'Maple Street Realty',
-  'Cambridge Suites',
-  'The Newton Group',
-  'Harbor Properties',
-]
 
 export function TrustSignals() {
   return (
-    <section className="bg-cream py-20">
+    <section className="bg-cream py-14">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Google review badge */}
         <ScrollReveal animation="fade-in">
@@ -137,46 +131,31 @@ export function TrustSignals() {
 
         {/* Divider */}
         <ScrollReveal animation="fade-in" delay={500}>
-          <div className="mx-auto mt-12 h-px w-24 bg-charcoal/10" />
+          <div className="mx-auto mt-8 h-px w-24 bg-charcoal/10" />
         </ScrollReveal>
 
-        {/* Badge cards */}
-        <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {/* Trust badges — single column list */}
+        <div className="mx-auto mt-8 max-w-md">
           {badges.map((badge, i) => (
-            <ScrollReveal key={badge.label} animation="blur-in" delay={600 + i * 100}>
-              <div className="rounded-2xl border border-forest/10 bg-white p-4 text-center transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:shadow-forest/[0.04]">
-                <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-sage text-forest">
+            <ScrollReveal key={badge.label} animation="slide-up" delay={600 + i * 80}>
+              <div className={`flex items-center gap-4 py-3.5 ${
+                i < badges.length - 1 ? 'border-b border-charcoal/[0.06]' : ''
+              }`}>
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-forest/[0.07] text-forest">
                   {badge.icon}
                 </div>
-                <p className="mt-3 text-sm font-bold text-charcoal">
-                  {badge.label}
-                </p>
-                <p className="mt-1 text-[11px] text-charcoal/40">
-                  {badge.sub}
-                </p>
+                <div className="flex-1">
+                  <p className="text-base font-bold text-charcoal">{badge.label}</p>
+                  <p className="text-sm text-charcoal/35">{badge.sub}</p>
+                </div>
+                <svg className="h-4 w-4 shrink-0 text-forest/40" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
               </div>
             </ScrollReveal>
           ))}
         </div>
 
-        {/* Trusted by */}
-        <ScrollReveal animation="fade-in" delay={900}>
-          <div className="mt-14 text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-charcoal/30">
-              Trusted by businesses across Massachusetts
-            </p>
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-6">
-              {TRUSTED_BY.map((name) => (
-                <span
-                  key={name}
-                  className="rounded-lg bg-charcoal/[0.03] px-4 py-2 font-display text-sm italic text-charcoal/25"
-                >
-                  {name}
-                </span>
-              ))}
-            </div>
-          </div>
-        </ScrollReveal>
       </div>
     </section>
   )

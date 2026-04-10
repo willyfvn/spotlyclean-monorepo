@@ -22,7 +22,7 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="bg-cream py-24">
+    <section id="how-it-works" className="bg-cream py-16">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <ScrollReveal animation="slide-up">
           <div className="text-center">
@@ -35,7 +35,7 @@ export function HowItWorks() {
           </div>
         </ScrollReveal>
 
-        <div className="mt-16 grid gap-10 sm:grid-cols-3 sm:gap-8">
+        <div className="mt-10 grid gap-10 sm:grid-cols-3 sm:gap-8">
           {steps.map((step, i) => (
             <ScrollReveal key={step.number} animation="slide-up" delay={i * 200}>
               <div className="relative text-center">

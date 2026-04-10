@@ -112,8 +112,8 @@ export function Hero() {
       </div>
 
       {/* Hero content */}
-      <div className="relative z-[5] mx-auto max-w-7xl px-6 pb-24 pt-8 sm:pb-32 sm:pt-20 lg:flex lg:items-center lg:gap-16 lg:px-8 lg:pt-28">
-        <div className="max-w-3xl lg:flex-1">
+      <div className="relative z-[5] mx-auto max-w-7xl px-6 pb-24 pt-8 sm:pb-32 sm:pt-20 lg:px-8 lg:pt-28">
+        <div className="max-w-3xl">
           {/* Urgency badge */}
           <div className="animate-slide-up inline-flex items-center gap-2.5 rounded-full border border-gold/30 bg-gold/10 px-3.5 py-1.5 text-xs font-medium text-gold-dark sm:px-4 sm:py-2 sm:text-sm">
             <span className="relative flex h-2 w-2">
@@ -245,41 +245,6 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Desktop preview card */}
-        <div className="hidden lg:block lg:w-80">
-          <div className="animate-slide-up animate-delay-500 rounded-3xl border border-charcoal/[0.06] bg-white p-6 shadow-2xl shadow-forest/[0.08]">
-            <div className="border-b border-charcoal/[0.06] pb-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-forest">
-                Sample estimate
-              </p>
-            </div>
-            <div className="mt-4 space-y-3">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-charcoal/50">2 floors &middot; Biweekly</span>
-                <span className="font-semibold text-charcoal">$150/visit</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-charcoal/50">First clean (deep)</span>
-                <span className="font-semibold text-charcoal">$250</span>
-              </div>
-            </div>
-            <div className="mt-4 rounded-2xl bg-sage/40 p-4 text-center">
-              <p className="text-xs font-medium text-charcoal/40">
-                Due today
-              </p>
-              <p className="mt-1 font-display text-2xl font-bold text-forest-deep">
-                $250
-              </p>
-            </div>
-            <Link
-              href="#quote"
-              className="mt-4 flex items-center justify-center gap-2 text-sm font-semibold text-forest transition-colors hover:text-forest-deep"
-            >
-              Customize your quote
-              <span>&rarr;</span>
-            </Link>
-          </div>
-        </div>
       </div>
 
       {/* Decorative blurs */}

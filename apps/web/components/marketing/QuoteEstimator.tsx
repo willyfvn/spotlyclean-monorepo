@@ -60,14 +60,16 @@ export function QuoteEstimator() {
   const firstCleanDollars = firstCleanCents / 100
   const priceDollars = priceCents / 100
 
-  // For one-time mode, skip frequency step
-  const totalSteps = serviceMode === 'onetime' ? 3 : 4
+  // One-time: Property → Size → Extras → Estimate
+  // Recurring: Property → Size → Frequency → Extras → Estimate
+  const totalSteps = serviceMode === 'onetime' ? 4 : 5
+  // Only show steps up to Extras in the indicator (Estimate is a reveal, not a step)
   const STEP_LABELS =
     serviceMode === 'onetime'
       ? ['Property', 'Size', 'Extras']
       : ['Property', 'Size', 'Frequency', 'Extras']
+  const visibleSteps = STEP_LABELS.length
 
-  const isLastStep = step === totalSteps
   const isResidential = propertyType !== 'office'
 
   function toggleAddOn(addOn: AddOn) {
@@ -87,16 +89,18 @@ export function QuoteEstimator() {
   // Map logical step to content step based on mode
   function getContentStep() {
     if (serviceMode === 'onetime') {
-      // Steps: 1=Property, 2=Size, 3=Extras
+      // Steps: 1=Property, 2=Size, 3=Extras, 4=Estimate
       if (step === 1) return 'property'
       if (step === 2) return 'size'
-      return 'extras'
+      if (step === 3) return 'extras'
+      return 'estimate'
     }
-    // Steps: 1=Property, 2=Size, 3=Frequency, 4=Extras
+    // Steps: 1=Property, 2=Size, 3=Frequency, 4=Extras, 5=Estimate
     if (step === 1) return 'property'
     if (step === 2) return 'size'
     if (step === 3) return 'frequency'
-    return 'extras'
+    if (step === 4) return 'extras'
+    return 'estimate'
   }
 
   const contentStep = getContentStep()
@@ -150,8 +154,8 @@ export function QuoteEstimator() {
         </div>
 
         <div className="rounded-3xl border border-charcoal/[0.06] bg-white p-6 shadow-xl shadow-charcoal/[0.04] sm:p-10">
-          {/* Sticky price ticker */}
-          <div className="mb-6 flex items-center justify-between rounded-2xl bg-sage/30 px-5 py-3">
+          {/* Sticky price ticker — hidden on estimate */}
+          <div className={`mb-6 flex items-center justify-between rounded-2xl bg-sage/30 px-5 py-3 ${contentStep === 'estimate' ? 'hidden' : ''}`}>
             <span className="text-sm font-medium text-charcoal/60">
               Estimated total
             </span>
@@ -168,8 +172,8 @@ export function QuoteEstimator() {
             </span>
           </div>
 
-          {/* Step indicators */}
-          <div className="mb-10 flex items-center justify-center">
+          {/* Step indicators — hidden on estimate */}
+          <div className={`mb-10 flex items-center justify-center ${contentStep === 'estimate' ? 'hidden' : ''}`}>
             {STEP_LABELS.map((label, i) => {
               const s = i + 1
               return (
@@ -218,7 +222,7 @@ export function QuoteEstimator() {
                       {label}
                     </span>
                   </div>
-                  {s < totalSteps && (
+                  {s < visibleSteps && (
                     <div
                       className={`mx-3 h-px w-10 sm:w-14 ${
                         s < step ? 'bg-forest/25' : 'bg-charcoal/[0.08]'
@@ -493,166 +497,128 @@ export function QuoteEstimator() {
                   </button>
                 ))}
               </div>
-              <button
-                onClick={() => setStep(step - 1)}
-                className="mt-6 w-full rounded-full border border-charcoal/10 px-6 py-3.5 text-base font-semibold text-charcoal/60 transition-all active:scale-[0.97] hover:border-charcoal/20 hover:bg-charcoal/[0.03]"
-              >
-                Back
-              </button>
+              <div className="mt-8 grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setStep(step - 1)}
+                  className="rounded-full border border-charcoal/10 px-6 py-3.5 text-base font-semibold text-charcoal/60 transition-all active:scale-[0.97] hover:border-charcoal/20 hover:bg-charcoal/[0.03]"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={() => setStep(step + 1)}
+                  className="rounded-full bg-forest px-6 py-3.5 text-base font-semibold text-white shadow-md shadow-forest/20 transition-all active:scale-[0.97] hover:bg-forest-deep hover:shadow-lg"
+                >
+                  See my estimate
+                </button>
+              </div>
             </div>
           )}
 
-          {/* Price reveal */}
-          {isLastStep && (
-            <div className="mt-8 overflow-hidden rounded-2xl border border-forest/10">
-              {/* Receipt header */}
-              <div className="bg-gradient-to-br from-forest-deep to-forest px-6 py-5 text-center">
-                <p className="font-display text-lg italic text-white">
-                  Your SpotlyClean Estimate
-                </p>
-              </div>
+          {/* Step: Estimate */}
+          {contentStep === 'estimate' && (
+            <div>
+              <h3 className="mb-6 text-lg font-bold text-charcoal">
+                Your estimate
+              </h3>
 
-              {/* Receipt body */}
-              <div className="bg-white p-6">
-                <div className="space-y-4">
-                  {serviceMode === 'recurring' && (
-                    <>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-semibold text-charcoal/80">
-                            First clean (deep clean)
-                          </p>
-                          <p className="text-xs text-charcoal/35">
-                            One-time fee
-                          </p>
-                        </div>
-                        <p className="text-lg font-bold text-charcoal">
-                          ${firstCleanDollars}
-                        </p>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-semibold text-charcoal/80">
-                            Recurring clean
-                          </p>
-                          <p className="text-xs text-charcoal/35">
-                            {frequency === 'weekly'
-                              ? 'Per visit, billed weekly'
-                              : 'Per visit, every 2 weeks'}
-                          </p>
-                        </div>
-                        <p className="text-lg font-bold text-charcoal">
-                          ${priceDollars}
-                        </p>
-                      </div>
-                    </>
-                  )}
-
-                  {serviceMode === 'onetime' && (
+              <div className="space-y-4">
+                {serviceMode === 'recurring' && (
+                  <>
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-semibold text-charcoal/80">
-                          Deep clean
+                          First clean (deep clean)
                         </p>
-                        <p className="text-xs text-charcoal/35">
-                          One-time service
-                        </p>
+                        <p className="text-xs text-charcoal/35">One-time fee</p>
                       </div>
                       <p className="text-lg font-bold text-charcoal">
                         ${firstCleanDollars}
                       </p>
                     </div>
-                  )}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-semibold text-charcoal/80">
+                          Recurring clean
+                        </p>
+                        <p className="text-xs text-charcoal/35">
+                          {frequency === 'weekly'
+                            ? 'Per visit, billed weekly'
+                            : 'Per visit, every 2 weeks'}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-charcoal/30 line-through">
+                            ${firstCleanDollars}
+                          </span>
+                          <span className="text-lg font-bold text-charcoal">
+                            ${priceDollars}
+                          </span>
+                        </div>
+                        <span className="text-xs font-semibold text-forest">
+                          Save {Math.round(((firstCleanDollars - priceDollars) / firstCleanDollars) * 100)}%
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                )}
 
-                  {/* Area average comparison */}
-                  <div className="flex items-center justify-between border-t border-charcoal/[0.06] pt-4">
-                    <p className="text-sm text-charcoal/40">Area average*</p>
-                    <p className="text-sm text-charcoal/30 line-through">
-                      ${Math.round(firstCleanDollars * 1.35)}
+                {serviceMode === 'onetime' && (
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-charcoal/80">
+                        Deep clean
+                      </p>
+                      <p className="text-xs text-charcoal/35">One-time service</p>
+                    </div>
+                    <p className="text-lg font-bold text-charcoal">
+                      ${firstCleanDollars}
                     </p>
                   </div>
+                )}
 
-                  {/* Total */}
-                  <div className="rounded-xl bg-sage/30 p-4">
-                    <div className="flex items-end justify-between">
-                      <p className="text-xs font-medium uppercase tracking-wider text-charcoal/40">
-                        Total due today
-                      </p>
-                      <p className="font-display text-3xl font-bold text-forest-deep">
-                        ${firstCleanDollars}
-                      </p>
-                    </div>
+                <div className="rounded-xl bg-sage/30 p-4">
+                  <div className="flex items-end justify-between">
+                    <p className="text-xs font-medium uppercase tracking-wider text-charcoal/40">
+                      Total due today
+                    </p>
+                    <p className="font-display text-3xl font-bold text-forest-deep">
+                      ${firstCleanDollars}
+                    </p>
                   </div>
                 </div>
-
-                {/* Social proof */}
-                <div className="mt-4 flex items-center justify-center gap-2">
-                  <div className="flex -space-x-1.5">
-                    {['#2d6a4f', '#d4a373', '#52b788'].map((color, i) => (
-                      <div
-                        key={i}
-                        className="h-5 w-5 rounded-full ring-2 ring-white"
-                        style={{ backgroundColor: color }}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-xs text-charcoal/40">
-                    27 people in Boston booked this week
-                  </span>
-                </div>
-
-                {/* Book CTA */}
-                <button
-                  onClick={handleBook}
-                  className="group mt-6 w-full rounded-full bg-forest px-8 py-4 text-base font-bold text-white shadow-lg shadow-forest/25 transition-all active:scale-[0.97] hover:bg-forest-deep hover:shadow-xl hover:shadow-forest/30"
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    <svg
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2}
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
-                      />
-                    </svg>
-                    Secure my booking
-                    <span className="inline-block transition-transform group-hover:translate-x-1">
-                      &rarr;
-                    </span>
-                  </span>
-                </button>
-
-                {/* Micro-trust */}
-                <div className="mt-4 flex items-center justify-center gap-4 text-[11px] text-charcoal/35">
-                  <span className="flex items-center gap-1">
-                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                    </svg>
-                    Secure checkout
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                    </svg>
-                    Satisfaction guarantee
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                    </svg>
-                    Free reschedule
-                  </span>
-                </div>
-
-                <p className="mt-3 text-center text-[10px] text-charcoal/25">
-                  *Area average based on local market survey
-                </p>
               </div>
+
+              <button
+                onClick={handleBook}
+                className="group mt-6 w-full rounded-full bg-forest px-8 py-4 text-base font-bold text-white shadow-lg shadow-forest/25 transition-all active:scale-[0.97] hover:bg-forest-deep hover:shadow-xl hover:shadow-forest/30"
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+                    />
+                  </svg>
+                  Secure my booking
+                  <span className="inline-block transition-transform group-hover:translate-x-1">
+                    &rarr;
+                  </span>
+                </span>
+              </button>
+              <button
+                onClick={() => setStep(step - 1)}
+                className="mt-3 w-full rounded-full border border-charcoal/10 px-6 py-3.5 text-base font-semibold text-charcoal/60 transition-all active:scale-[0.97] hover:border-charcoal/20 hover:bg-charcoal/[0.03]"
+              >
+                Back
+              </button>
             </div>
           )}
         </div>
