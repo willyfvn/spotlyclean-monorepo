@@ -1,48 +1,62 @@
+'use client'
+
+import { ScrollReveal } from '@/components/ui/ScrollReveal'
+
 const steps = [
   {
-    number: '1',
+    number: '01',
     title: 'Get your estimate',
-    description:
-      'Tell us about your space and get an instant price — no phone calls, no waiting.',
+    description: 'Tell us about your space and get an instant price — no waiting.',
   },
   {
-    number: '2',
+    number: '02',
     title: 'Book online',
-    description:
-      'Pick your date and time, add any extras, and pay securely online.',
+    description: 'Pick a date, add extras, and pay securely in minutes.',
   },
   {
-    number: '3',
+    number: '03',
     title: 'Sit back & relax',
-    description:
-      'Our insured, vetted cleaners handle the rest. Track progress in real time.',
+    description: 'Our vetted, insured cleaners handle everything.',
   },
 ]
 
 export function HowItWorks() {
   return (
-    <section className="bg-white py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-slate-900">How it works</h2>
-          <p className="mt-2 text-slate-600">
-            From quote to clean in three simple steps
-          </p>
-        </div>
+    <section id="how-it-works" className="bg-cream py-24">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <ScrollReveal animation="slide-up">
+          <div className="text-center">
+            <p className="text-sm font-semibold uppercase tracking-[0.15em] text-forest">
+              Simple process
+            </p>
+            <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-charcoal sm:text-4xl">
+              How it works
+            </h2>
+          </div>
+        </ScrollReveal>
 
-        <div className="mt-14 grid gap-10 sm:grid-cols-3">
-          {steps.map((step) => (
-            <div key={step.number} className="text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary text-xl font-bold text-white">
-                {step.number}
+        <div className="mt-16 grid gap-10 sm:grid-cols-3 sm:gap-8">
+          {steps.map((step, i) => (
+            <ScrollReveal key={step.number} animation="slide-up" delay={i * 200}>
+              <div className="relative text-center">
+                {/* Connecting line */}
+                {i < steps.length - 1 && (
+                  <div className="absolute left-[calc(50%+32px)] right-[calc(-50%+32px)] top-5 hidden h-px bg-gradient-to-r from-forest/15 to-transparent sm:block" />
+                )}
+
+                {/* Large typographic number */}
+                <span className="relative inline-block font-display text-5xl font-bold text-forest/15">
+                  {step.number}
+                </span>
+
+                <h3 className="mt-3 text-lg font-bold text-charcoal">
+                  {step.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-charcoal/45">
+                  {step.description}
+                </p>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-slate-900">
-                {step.title}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                {step.description}
-              </p>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
       </div>

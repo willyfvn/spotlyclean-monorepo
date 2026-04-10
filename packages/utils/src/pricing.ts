@@ -1,4 +1,4 @@
-import type { QuoteParams, AddOn } from '@spotlyclean/types'
+import type { QuoteParams, AddOn } from '../../types/src/index'
 
 // Base prices in dollars
 export const BASE_PRICES = {
@@ -17,30 +17,43 @@ export const ADD_ON_PRICES: Record<AddOn, number> = {
 }
 
 /**
- * Calculate total price in cents for a given quote.
- * Always returns price in cents (integer).
+ * Calculate the recurring price per visit in cents.
  */
 export function calculatePrice(params: QuoteParams): number {
   const { propertyType, floors, frequency, addOns } = params
 
   let basePriceDollars: number
 
-  if (propertyType === 'office' || propertyType === 'restaurant') {
-    // Office/restaurant pricing is by frequency
+  if (propertyType === 'office') {
     basePriceDollars = BASE_PRICES.office[frequency] ?? BASE_PRICES.office.weekly
   } else {
-    // Residential pricing: once = deep_clean, otherwise by frequency
-    const tier = frequency === 'once' ? 'deep_clean' : frequency
-    basePriceDollars = BASE_PRICES[tier][floors] ?? 0
+    basePriceDollars = BASE_PRICES[frequency][floors] ?? 0
   }
 
-  // Add-on prices
   const addOnTotalDollars = addOns.reduce((sum, addOn) => {
     return sum + (ADD_ON_PRICES[addOn] ?? 0)
   }, 0)
 
-  const totalDollars = basePriceDollars + addOnTotalDollars
+  return (basePriceDollars + addOnTotalDollars) * 100
+}
 
-  // Return in cents
-  return totalDollars * 100
+/**
+ * Calculate the one-time first clean (deep clean) price in cents.
+ */
+export function calculateFirstCleanPrice(params: Pick<QuoteParams, 'propertyType' | 'floors' | 'addOns'>): number {
+  const { propertyType, floors, addOns } = params
+
+  let basePriceDollars: number
+
+  if (propertyType === 'office') {
+    basePriceDollars = BASE_PRICES.office.weekly
+  } else {
+    basePriceDollars = BASE_PRICES.deep_clean[floors] ?? 0
+  }
+
+  const addOnTotalDollars = addOns.reduce((sum, addOn) => {
+    return sum + (ADD_ON_PRICES[addOn] ?? 0)
+  }, 0)
+
+  return (basePriceDollars + addOnTotalDollars) * 100
 }

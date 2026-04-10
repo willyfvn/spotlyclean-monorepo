@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/willy/spotlyclean-monorepo/.claude/**)",
+      "Read(//c/Users/willy/.claude/**)",
+      "Bash(mkdir -p C:/Users/willy/spotlyclean-monorepo/.claude/skills/frontend-design)",
+      "Bash(mv C:/Users/willy/spotlyclean-monorepo/apps/web/.claude/skills/frontend-design/SKILL.md C:/Users/willy/spotlyclean-monorepo/.claude/skills/frontend-design/SKILL.md)",
+      "Bash(rm -rf C:/Users/willy/spotlyclean-monorepo/apps/web/.claude/skills)",
+      "Bash(npx tsc:*)"
+    ]
+  }
+}

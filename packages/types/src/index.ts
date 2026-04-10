@@ -9,7 +9,7 @@ export type BookingStatus =
   | 'cancelled'
 
 // Service frequency
-export type Frequency = 'once' | 'weekly' | 'biweekly'
+export type Frequency = 'weekly' | 'biweekly'
 
 // Property type
 export type PropertyType = 'home' | 'office' | 'airbnb' | 'post_construction' | 'restaurant'
