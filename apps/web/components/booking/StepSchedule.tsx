@@ -105,9 +105,6 @@ export function StepSchedule({
   }
 
   const canProceed = scheduledAt > 0
-  const confirmLabel = selectedDate
-    ? `Confirm \u2014 ${selectedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}`
-    : 'Select a date to continue'
 
   return (
     <div>
@@ -224,10 +221,22 @@ export function StepSchedule({
         />
       </div>
 
-      <div className="mt-6 flex gap-3">
+      {selectedDate && (
+        <div className="mt-6 flex items-center gap-2 rounded-xl bg-sage/40 px-4 py-3">
+          <svg className="h-4 w-4 text-forest" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+          </svg>
+          <span className="text-sm font-medium text-forest-deep">
+            {selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })} at{' '}
+            {selectedDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+          </span>
+        </div>
+      )}
+
+      <div className="mt-4 flex gap-3">
         <button
           onClick={onBack}
-          className="flex-1 rounded-full border border-charcoal/10 px-4 py-3.5 text-base font-semibold text-charcoal/60 transition-all hover:bg-charcoal/[0.03] active:scale-[0.97]"
+          className="rounded-full border border-charcoal/10 px-6 py-3.5 text-base font-semibold text-charcoal/60 transition-all hover:bg-charcoal/[0.03] active:scale-[0.97]"
         >
           Back
         </button>
@@ -236,7 +245,7 @@ export function StepSchedule({
           disabled={!canProceed}
           className="flex-1 rounded-full bg-forest px-4 py-3.5 text-base font-semibold text-white shadow-md shadow-forest/20 transition-all hover:bg-forest-deep disabled:opacity-50 active:scale-[0.97]"
         >
-          {confirmLabel}
+          {canProceed ? 'Continue' : 'Select a date'}
         </button>
       </div>
     </div>

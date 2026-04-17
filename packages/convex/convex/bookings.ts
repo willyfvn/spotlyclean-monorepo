@@ -163,6 +163,76 @@ export const createDraft = mutation({
   },
 })
 
+export const createGuestDraft = mutation({
+  args: {
+    email: v.string(),
+    name: v.string(),
+    phone: v.optional(v.string()),
+    propertyType: v.union(
+      v.literal('home'),
+      v.literal('office'),
+      v.literal('airbnb'),
+      v.literal('post_construction'),
+      v.literal('restaurant')
+    ),
+    floors: v.union(v.literal(1), v.literal(2), v.literal(3)),
+    frequency: v.union(v.literal('once'), v.literal('weekly'), v.literal('biweekly')),
+    addOns: v.array(
+      v.union(
+        v.literal('fridge'),
+        v.literal('stove'),
+        v.literal('inside_windows'),
+        v.literal('dishes'),
+        v.literal('pet_surcharge')
+      )
+    ),
+    scheduledAt: v.number(),
+    durationMinutes: v.number(),
+    totalPriceCents: v.number(),
+    address: v.optional(v.string()),
+    notes: v.optional(v.string()),
+    entryInstructions: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Find existing user by email or create a guest user
+    let user = await ctx.db
+      .query('users')
+      .withIndex('by_email', (q) => q.eq('email', args.email))
+      .first()
+
+    if (!user) {
+      const guestClerkId = `guest_${Date.now()}_${Math.random().toString(36).slice(2)}`
+      const referralCode = `SC-${guestClerkId.slice(-6).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`
+      const userId = await ctx.db.insert('users', {
+        clerkId: guestClerkId,
+        email: args.email,
+        name: args.name,
+        phone: args.phone,
+        loyaltyPoints: 0,
+        referralCode,
+      })
+      user = (await ctx.db.get(userId))!
+    }
+
+    const bookingId = await ctx.db.insert('bookings', {
+      userId: user._id,
+      propertyType: args.propertyType,
+      floors: args.floors,
+      frequency: args.frequency,
+      addOns: args.addOns,
+      scheduledAt: args.scheduledAt,
+      durationMinutes: args.durationMinutes,
+      status: 'draft',
+      totalPriceCents: args.totalPriceCents,
+      address: args.address,
+      notes: args.notes,
+      entryInstructions: args.entryInstructions,
+    })
+
+    return bookingId
+  },
+})
+
 export const confirm = mutation({
   args: {
     bookingId: v.id('bookings'),

@@ -4,6 +4,13 @@
   "private": true,
   "main": "./convex/_generated/api.js",
   "types": "./convex/_generated/api.d.ts",
+  "exports": {
+    ".": {
+      "types": "./convex/_generated/api.d.ts",
+      "import": "./convex/_generated/api.js",
+      "default": "./convex/_generated/api.js"
+    }
+  },
   "scripts": {
     "dev": "convex dev",
     "deploy": "convex deploy",

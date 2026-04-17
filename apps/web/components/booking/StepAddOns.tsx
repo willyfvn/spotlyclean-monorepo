@@ -10,7 +10,6 @@ const KITCHEN_ADDONS: { value: AddOn; label: string; price: number; desc: string
 
 const HOME_ADDONS: { value: AddOn; label: string; price: number; desc: string }[] = [
   { value: 'inside_windows', label: 'Inside windows', price: 20, desc: 'Streak-free interior glass' },
-  { value: 'pet_surcharge', label: 'Pet surcharge', price: 25, desc: 'Extra vacuuming for pet hair & dander' },
 ]
 
 interface Props {

@@ -22,6 +22,7 @@ export default defineSchema({
     stripeSubscriptionId: v.optional(v.string()),
     pushToken: v.optional(v.string()),
   }).index('by_clerk_id', ['clerkId'])
+    .index('by_email', ['email'])
     .index('by_referral_code', ['referralCode']),
 
   bookings: defineTable({
@@ -57,6 +58,7 @@ export default defineSchema({
     totalPriceCents: v.number(),          // always store in cents
     stripePaymentIntentId: v.optional(v.string()),
     stripeSessionId: v.optional(v.string()),
+    address: v.optional(v.string()),
     notes: v.optional(v.string()),
     entryInstructions: v.optional(v.string()),
     rating: v.optional(v.number()),       // 1-5, set after completion

@@ -7,10 +7,10 @@ const PROPERTY_TYPES: { value: PropertyType; label: string; sub: string }[] = [
   { value: 'office', label: 'Office', sub: 'Workspaces & commercial' },
 ]
 
-const FLOOR_OPTIONS: { value: 1 | 2 | 3; label: string; duration: string }[] = [
-  { value: 1, label: '1 Floor', duration: '~2h' },
-  { value: 2, label: '2 Floors', duration: '~3h' },
-  { value: 3, label: '3 Floors', duration: '~4h' },
+const FLOOR_OPTIONS: { value: 1 | 2 | 3; label: string }[] = [
+  { value: 1, label: '1 Floor' },
+  { value: 2, label: '2 Floors' },
+  { value: 3, label: '3 Floors' },
 ]
 
 const INCLUDED = [
@@ -99,7 +99,6 @@ export function StepProperty({ propertyType, floors, onPropertyTypeChange, onFlo
                 <span className={`mt-0.5 block text-xs font-medium ${floors === f.value ? 'text-forest-deep' : 'text-charcoal/50'}`}>
                   {f.value === 1 ? 'Floor' : 'Floors'}
                 </span>
-                <span className="mt-1 block text-[10px] text-charcoal/30">{f.duration}</span>
               </button>
             ))}
           </div>

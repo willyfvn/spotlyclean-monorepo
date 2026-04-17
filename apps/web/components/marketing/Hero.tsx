@@ -13,7 +13,7 @@ export function Hero() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <section className="relative min-h-[100svh] overflow-hidden bg-cream">
+    <section className="relative overflow-hidden bg-cream">
       {/* Navigation */}
       <nav className="relative z-20 mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-8 lg:py-6">
         <Link
@@ -156,29 +156,7 @@ export function Hero() {
                   &rarr;
                 </span>
               </Link>
-              <span className="mt-2 pl-1 text-xs text-charcoal/35">
-                No credit card needed
-              </span>
             </div>
-            <Link
-              href="#how-it-works"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-charcoal/50 transition-colors hover:text-charcoal/70"
-            >
-              How it works
-              <svg
-                className="h-3.5 w-3.5"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3"
-                />
-              </svg>
-            </Link>
           </div>
 
           {/* Social proof strip */}

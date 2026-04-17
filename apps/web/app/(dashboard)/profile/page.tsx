@@ -2,11 +2,9 @@
 
 import { useQuery, useMutation } from 'convex/react'
 import { api } from '@spotlyclean/convex'
-import { useUser } from '@clerk/nextjs'
 import { useState, useEffect } from 'react'
 
 export default function ProfilePage() {
-  const { user: clerkUser } = useUser()
   const profile = useQuery(api.users.getProfile)
   const updateProfile = useMutation(api.users.updateProfile)
 
@@ -71,7 +69,7 @@ export default function ProfilePage() {
             <label className="block text-sm font-medium text-slate-700">Email</label>
             <input
               type="email"
-              value={clerkUser?.primaryEmailAddress?.emailAddress || profile?.email || ''}
+              value={profile?.email || ''}
               disabled
               className="mt-1 w-full rounded-lg border bg-slate-50 px-3 py-2 text-sm text-slate-500"
             />

@@ -37,7 +37,21 @@
       "Bash(cp -r packages/types node_modules/@spotlyclean/types)",
       "Bash(cp -r packages/utils node_modules/@spotlyclean/utils)",
       "Bash(cp -r packages/ui node_modules/@spotlyclean/ui)",
-      "Bash(cp -r packages/convex node_modules/@spotlyclean/convex)"
+      "Bash(cp -r packages/convex node_modules/@spotlyclean/convex)",
+      "Bash(PORT=3000 pnpm dev:web:*)",
+      "Bash(npx convex:*)",
+      "Bash(nvm ls:*)",
+      "Bash(fnm list:*)",
+      "Bash(brew list:*)",
+      "Bash(kill 7547)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/book)",
+      "Bash(stripe listen:*)",
+      "Read(//tmp/**)",
+      "Bash(jobs -l)",
+      "Bash(lsof -ti:3000)",
+      "Bash(xargs kill:*)"
     ]
   }
 }

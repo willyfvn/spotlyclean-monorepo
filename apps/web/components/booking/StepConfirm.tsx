@@ -2,6 +2,22 @@
 
 import Link from 'next/link'
 
+interface Props {
+  guestEmail?: string
+  guestName?: string
+  scheduledAt?: number
+  propertyType?: string
+  firstCleanCents?: number
+}
+
+const PROPERTY_LABELS: Record<string, string> = {
+  home: 'Home',
+  office: 'Office',
+  airbnb: 'Airbnb',
+  post_construction: 'Post-Construction',
+  restaurant: 'Restaurant',
+}
+
 const NEXT_STEPS = [
   {
     title: 'Check your email',
@@ -32,7 +48,9 @@ const NEXT_STEPS = [
   },
 ]
 
-export function StepConfirm() {
+export function StepConfirm({ guestEmail, guestName, scheduledAt, propertyType, firstCleanCents }: Props) {
+  const date = scheduledAt ? new Date(scheduledAt) : null
+
   return (
     <div className="py-6">
       {/* Success icon */}
@@ -56,9 +74,43 @@ export function StepConfirm() {
           Your home is in good hands.
         </h3>
         <p className="mt-2 text-sm text-charcoal/50">
-          A confirmation email is on its way to your inbox.
+          {guestEmail
+            ? <>A confirmation email with your login details is on its way to <strong className="text-charcoal/70">{guestEmail}</strong>.</>
+            : 'A confirmation email is on its way to your inbox.'}
         </p>
       </div>
+
+      {/* Booking summary */}
+      {(date || propertyType || firstCleanCents) && (
+        <div className="mt-6 rounded-2xl border border-sage-dark/30 bg-cream p-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-charcoal/30 mb-3">
+            Booking details
+          </p>
+          <div className="space-y-2">
+            {propertyType && (
+              <div className="flex justify-between text-sm">
+                <span className="text-charcoal/60">Service</span>
+                <span className="font-medium text-charcoal">{PROPERTY_LABELS[propertyType] || propertyType} cleaning</span>
+              </div>
+            )}
+            {date && (
+              <div className="flex justify-between text-sm">
+                <span className="text-charcoal/60">Date</span>
+                <span className="font-medium text-charcoal">
+                  {date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at{' '}
+                  {date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                </span>
+              </div>
+            )}
+            {firstCleanCents && (
+              <div className="flex justify-between text-sm">
+                <span className="text-charcoal/60">Total paid</span>
+                <span className="font-semibold text-forest-deep">${(firstCleanCents / 100).toFixed(0)}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* What happens next */}
       <div className="mt-8">

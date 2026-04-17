@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { UserButton } from '@clerk/nextjs'
 
 const navItems = [
   {
@@ -97,15 +96,7 @@ export function Sidebar() {
 
       {/* User */}
       <div className="border-t px-6 py-4">
-        <UserButton
-          afterSignOutUrl="/"
-          appearance={{
-            elements: {
-              rootBox: 'w-full',
-              userButtonTrigger: 'w-full justify-start',
-            },
-          }}
-        />
+        <span className="text-sm text-slate-500">Guest</span>
       </div>
     </aside>
   )

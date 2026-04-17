@@ -39,7 +39,15 @@ interface Props {
   priceCents: number
   firstCleanCents: number
   durationMinutes: number
-  createDraft: (args: any) => Promise<any>
+  guestName: string
+  guestEmail: string
+  guestPhone: string
+  guestAddress: string
+  onGuestNameChange: (v: string) => void
+  onGuestEmailChange: (v: string) => void
+  onGuestPhoneChange: (v: string) => void
+  onGuestAddressChange: (v: string) => void
+  createGuestDraft: (args: any) => Promise<any>
   onBack: () => void
 }
 
@@ -54,7 +62,15 @@ export function StepPayment({
   priceCents,
   firstCleanCents,
   durationMinutes,
-  createDraft,
+  guestName,
+  guestEmail,
+  guestPhone,
+  guestAddress,
+  onGuestNameChange,
+  onGuestEmailChange,
+  onGuestPhoneChange,
+  onGuestAddressChange,
+  createGuestDraft,
   onBack,
 }: Props) {
   const [isProcessing, setIsProcessing] = useState(false)
@@ -62,10 +78,30 @@ export function StepPayment({
   const date = new Date(scheduledAt)
 
   async function handlePay() {
+    if (!guestName.trim()) {
+      setError('Please enter your name.')
+      return
+    }
+    if (!guestEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail)) {
+      setError('Please enter a valid email address.')
+      return
+    }
+    if (!guestPhone.trim()) {
+      setError('Please enter your phone number.')
+      return
+    }
+    if (!guestAddress.trim()) {
+      setError('Please enter your address.')
+      return
+    }
+
     setIsProcessing(true)
     setError('')
     try {
-      const bookingId = await createDraft({
+      const bookingId = await createGuestDraft({
+        email: guestEmail.trim(),
+        name: guestName.trim(),
+        phone: guestPhone.trim() || undefined,
         propertyType,
         floors,
         frequency,
@@ -73,14 +109,25 @@ export function StepPayment({
         scheduledAt,
         durationMinutes,
         totalPriceCents: firstCleanCents,
+        address: guestAddress.trim(),
         notes: notes || undefined,
         entryInstructions: entryInstructions || undefined,
       })
 
+      // Save booking state for restoration after Stripe redirect
+      sessionStorage.setItem('spotly_booking', JSON.stringify({
+        propertyType, floors, frequency, addOns, scheduledAt,
+        firstCleanCents, priceCents, guestEmail: guestEmail.trim(),
+        guestName: guestName.trim(),
+      }))
+
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookingId, propertyType, floors, frequency, addOns }),
+        body: JSON.stringify({
+          bookingId, propertyType, floors, frequency, addOns,
+          email: guestEmail.trim(), name: guestName.trim(), scheduledAt,
+        }),
       })
 
       const data = await res.json()
@@ -105,6 +152,64 @@ export function StepPayment({
         Your Booking Summary
       </p>
 
+      {/* Contact info */}
+      <div className="mb-6 space-y-3">
+        <div>
+          <label className="block text-sm font-medium text-charcoal mb-1.5">
+            Full name <span className="text-red-400">*</span>
+          </label>
+          <input
+            type="text"
+            value={guestName}
+            onChange={(e) => onGuestNameChange(e.target.value)}
+            placeholder="Jane Smith"
+            className="w-full rounded-xl border border-charcoal/[0.08] px-4 py-3 text-sm placeholder:text-charcoal/30 focus:border-forest focus:outline-none focus:ring-1 focus:ring-forest"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-charcoal mb-1.5">
+            Email <span className="text-red-400">*</span>
+          </label>
+          <input
+            type="email"
+            value={guestEmail}
+            onChange={(e) => onGuestEmailChange(e.target.value)}
+            placeholder="jane@example.com"
+            className="w-full rounded-xl border border-charcoal/[0.08] px-4 py-3 text-sm placeholder:text-charcoal/30 focus:border-forest focus:outline-none focus:ring-1 focus:ring-forest"
+          />
+          <p className="mt-1 text-[11px] text-charcoal/35">
+            We&apos;ll send your booking confirmation and login details here.
+          </p>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-charcoal mb-1.5">
+            Phone <span className="text-red-400">*</span>
+          </label>
+          <input
+            type="tel"
+            value={guestPhone}
+            onChange={(e) => onGuestPhoneChange(e.target.value)}
+            placeholder="(617) 555-0180"
+            className="w-full rounded-xl border border-charcoal/[0.08] px-4 py-3 text-sm placeholder:text-charcoal/30 focus:border-forest focus:outline-none focus:ring-1 focus:ring-forest"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-charcoal mb-1.5">
+            Address <span className="text-red-400">*</span>
+          </label>
+          <input
+            type="text"
+            value={guestAddress}
+            onChange={(e) => onGuestAddressChange(e.target.value)}
+            placeholder="123 Main St, Boston, MA 02101"
+            className="w-full rounded-xl border border-charcoal/[0.08] px-4 py-3 text-sm placeholder:text-charcoal/30 focus:border-forest focus:outline-none focus:ring-1 focus:ring-forest"
+          />
+          <p className="mt-1 text-[11px] text-charcoal/35">
+            Full street address where the cleaning will take place.
+          </p>
+        </div>
+      </div>
+
       {/* Summary card */}
       <div className="rounded-2xl border border-sage-dark/30 bg-cream p-5">
         <div className="space-y-3">
@@ -127,14 +232,6 @@ export function StepPayment({
               {date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
             </span>
           </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-charcoal/60">Est. duration</span>
-            <span className="font-medium text-charcoal">
-              ~{Math.floor(durationMinutes / 60)}h
-              {durationMinutes % 60 > 0 ? ` ${durationMinutes % 60}m` : ''}
-            </span>
-          </div>
-
           {addOns.length > 0 && (
             <div className="rounded-xl bg-white p-3 mt-2">
               <p className="text-xs font-medium text-charcoal/50 mb-2">Add-ons</p>

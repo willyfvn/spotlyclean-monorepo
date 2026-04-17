@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useMutation } from 'convex/react'
 import { api } from '@spotlyclean/convex'
@@ -28,8 +28,23 @@ export function BookingWizard() {
   const [scheduledAt, setScheduledAt] = useState<number>(0)
   const [notes, setNotes] = useState('')
   const [entryInstructions, setEntryInstructions] = useState('')
+  const [guestName, setGuestName] = useState('')
+  const [guestEmail, setGuestEmail] = useState('')
+  const [guestPhone, setGuestPhone] = useState('')
+  const [guestAddress, setGuestAddress] = useState('')
 
-  const createDraft = useMutation(api.bookings.createDraft)
+  // Restore booking state from sessionStorage after Stripe redirect
+  const [savedBooking, setSavedBooking] = useState<Record<string, any> | null>(null)
+  useEffect(() => {
+    if (currentStep === 6) {
+      try {
+        const saved = sessionStorage.getItem('spotly_booking')
+        if (saved) setSavedBooking(JSON.parse(saved))
+      } catch {}
+    }
+  }, [currentStep])
+
+  const createGuestDraft = useMutation(api.bookings.createGuestDraft)
 
   const priceCents = useMemo(
     () => calculatePrice({ propertyType, floors, frequency, addOns }),
@@ -68,18 +83,23 @@ export function BookingWizard() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      {/* Labeled step bar */}
+      {/* Step bar */}
       {currentStep < 6 && (
         <div className="mb-6">
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-xs font-medium text-charcoal/40">
-              Step {displayStep} of 5
-            </p>
-            <p className="font-display text-sm italic text-forest">
-              {STEP_NAMES[displayStep - 1]}
-            </p>
+            <div className="flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-forest text-[11px] font-bold text-white">
+                {displayStep}
+              </span>
+              <span className="text-sm font-semibold text-charcoal">
+                {STEP_NAMES[displayStep - 1]}
+              </span>
+            </div>
+            <span className="text-xs text-charcoal/30">
+              {displayStep} of 5
+            </span>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1">
             {STEP_NAMES.map((name, i) => {
               const s = i + 1
               return (
@@ -87,12 +107,12 @@ export function BookingWizard() {
                   key={name}
                   onClick={() => s < currentStep && goToStep(s)}
                   disabled={s >= currentStep}
-                  className={`h-2 flex-1 rounded-full transition-all ${
+                  className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
                     s < currentStep
-                      ? 'bg-forest cursor-pointer'
+                      ? 'bg-forest cursor-pointer hover:bg-forest-deep'
                       : s === currentStep
                         ? 'bg-forest'
-                        : 'bg-charcoal/[0.08]'
+                        : 'bg-charcoal/[0.06]'
                   }`}
                   title={name}
                 />
@@ -104,45 +124,39 @@ export function BookingWizard() {
 
       {/* Live price panel */}
       {currentStep < 6 && (
-        <div className="mb-6 rounded-2xl border border-sage-dark/20 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-charcoal/50">First clean (deep clean)</span>
-            <span className="font-semibold text-forest-deep">
-              ${(firstCleanCents / 100).toFixed(0)}
-            </span>
-          </div>
-          <div className="mt-1 flex items-center justify-between text-sm">
-            <span className="text-charcoal/50">
-              Recurring ({frequency === 'weekly' ? 'weekly' : 'every 2 weeks'})
-            </span>
-            <span className="font-semibold text-forest-deep">
-              ${(priceCents / 100).toFixed(0)}
-            </span>
+        <div className="mb-6 rounded-2xl bg-white p-4 shadow-sm shadow-charcoal/[0.04] ring-1 ring-charcoal/[0.06]">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-charcoal/40">Due today</p>
+              <p className="text-2xl font-bold text-forest-deep tracking-tight">
+                ${(firstCleanCents / 100).toFixed(0)}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs font-medium text-charcoal/40">Then</p>
+              <p className="text-sm font-semibold text-charcoal/70">
+                ${(priceCents / 100).toFixed(0)}
+                <span className="font-normal text-charcoal/40">/{frequency === 'weekly' ? 'wk' : '2wk'}</span>
+              </p>
+            </div>
           </div>
           {savingsPerVisit > 0 && (
-            <p className="mt-1 text-right text-xs font-medium text-forest">
-              You save ${savingsPerVisit}/visit vs biweekly
-            </p>
+            <div className="mt-2 flex items-center gap-1.5 rounded-lg bg-forest/[0.06] px-2.5 py-1.5">
+              <svg className="h-3 w-3 text-forest" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75" />
+              </svg>
+              <span className="text-xs font-medium text-forest">
+                Saving ${savingsPerVisit}/visit with weekly
+              </span>
+            </div>
           )}
-          <div className="mt-2 rounded-xl bg-sage/40 px-4 py-3 flex items-center justify-between">
-            <span className="text-sm font-medium text-charcoal/70">Due today</span>
-            <span className="text-xl font-bold text-forest-deep">
-              ${(firstCleanCents / 100).toFixed(0)}
-            </span>
-          </div>
-          <div className="mt-2 flex items-center justify-center gap-1.5 text-[11px] text-charcoal/35">
-            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-            </svg>
-            Secure checkout via Stripe
-          </div>
         </div>
       )}
 
       {/* Step content */}
       <div
         key={transitionKey}
-        className="rounded-2xl border border-charcoal/[0.06] bg-white p-6 shadow-md shadow-charcoal/5 sm:p-8 animate-scale-in"
+        className="rounded-2xl bg-white p-6 shadow-lg shadow-charcoal/[0.06] ring-1 ring-charcoal/[0.05] sm:p-8 animate-scale-in"
       >
         {currentStep === 1 && (
           <StepProperty
@@ -195,11 +209,27 @@ export function BookingWizard() {
             priceCents={priceCents}
             firstCleanCents={firstCleanCents}
             durationMinutes={durationMinutes}
-            createDraft={createDraft}
+            guestName={guestName}
+            guestEmail={guestEmail}
+            guestPhone={guestPhone}
+            guestAddress={guestAddress}
+            onGuestNameChange={setGuestName}
+            onGuestEmailChange={setGuestEmail}
+            onGuestPhoneChange={setGuestPhone}
+            onGuestAddressChange={setGuestAddress}
+            createGuestDraft={createGuestDraft}
             onBack={() => goToStep(4)}
           />
         )}
-        {currentStep === 6 && <StepConfirm />}
+        {currentStep === 6 && (
+          <StepConfirm
+            guestEmail={savedBooking?.guestEmail}
+            guestName={savedBooking?.guestName}
+            scheduledAt={savedBooking?.scheduledAt}
+            propertyType={savedBooking?.propertyType}
+            firstCleanCents={savedBooking?.firstCleanCents}
+          />
+        )}
       </div>
     </div>
   )

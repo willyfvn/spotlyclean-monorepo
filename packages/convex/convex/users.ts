@@ -100,6 +100,23 @@ export const createProfile = mutation({
   },
 })
 
+export const linkClerkAccount = mutation({
+  args: {
+    email: v.string(),
+    clerkId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_email', (q) => q.eq('email', args.email))
+      .first()
+
+    if (user && user.clerkId.startsWith('guest_')) {
+      await ctx.db.patch(user._id, { clerkId: args.clerkId })
+    }
+  },
+})
+
 export const updateProfile = mutation({
   args: {
     name: v.optional(v.string()),
