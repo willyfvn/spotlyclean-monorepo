@@ -5,13 +5,12 @@ import { ConvexHttpClient } from 'convex/browser'
 import { api } from '@spotlyclean/convex'
 import crypto from 'crypto'
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!)
-
 function generateTempPassword(): string {
   return crypto.randomBytes(12).toString('base64url').slice(0, 16)
 }
 
 export async function POST(request: Request) {
+  const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!)
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')
 
