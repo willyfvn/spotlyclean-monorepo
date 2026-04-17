@@ -3,7 +3,16 @@
     "allow": [
       "Bash(vercel --version)",
       "Bash(git check-ignore *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(npm i *)",
+      "Bash(pnpm add *)",
+      "Bash(npm config *)",
+      "Read(//usr/local/lib/node_modules/**)",
+      "Bash(mkdir -p ~/.npm-global)",
+      "Bash(export PATH=\"$HOME/.npm-global/bin:$PATH\")",
+      "Bash(vercel whoami *)"
     ]
   }
 }
